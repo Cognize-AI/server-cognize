@@ -1,8 +1,13 @@
 package config
 
+import "github.com/Cognize-AI/client-cognize/models"
+
 func SyncDB() {
-	//DB.Exec(`DROP INDEX IF EXISTS idx_view_events_shared_collection_id;`)
-	err := DB.AutoMigrate()
+	err := DB.AutoMigrate(
+		models.User{},
+		models.List{},
+		models.Card{},
+	)
 	if err != nil {
 		return
 	}

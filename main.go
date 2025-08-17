@@ -1,10 +1,12 @@
 package main
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/Cognize-AI/client-cognize/config"
 	"github.com/Cognize-AI/client-cognize/logger"
+	"github.com/Cognize-AI/client-cognize/router"
+	"go.uber.org/zap"
 )
 
 var Config config.Config
@@ -22,9 +24,15 @@ func init() {
 	logger.Logger.Info("DB connection established")
 	config.SyncDB()
 	logger.Logger.Info("DB sync completed")
-	defer logger.Logger.Sync()
+	defer func(Logger *zap.Logger) {
+		err := Logger.Sync()
+		if err != nil {
+
+		}
+	}(logger.Logger)
 }
 
 func main() {
-	fmt.Println("Hello World")
+	router.InitRouter()
+	log.Fatal(router.Start("0.0.0.0:" + Config.PORT))
 }
