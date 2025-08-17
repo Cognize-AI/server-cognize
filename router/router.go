@@ -3,13 +3,19 @@ package router
 import (
 	"net/http"
 
+	"github.com/Cognize-AI/client-cognize/internal/oauth"
+	"github.com/Cognize-AI/client-cognize/internal/user"
+	"github.com/Cognize-AI/client-cognize/middleware"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 var r *gin.Engine
 
-func InitRouter() {
+func InitRouter(
+	userHandler *user.Handler,
+	oauthHandler *oauth.Handler,
+) {
 	r = gin.Default()
 
 	r.Use(cors.New(cors.Config{
@@ -25,6 +31,17 @@ func InitRouter() {
 	r.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "Welcome to cognize")
 	})
+
+	userRouter := r.Group("/user")
+	{
+		userRouter.GET("/me", middleware.RequireAuth, userHandler.Me)
+	}
+
+	oAuthRouter := r.Group("/oauth")
+	{
+		oAuthRouter.GET("/google/redirect-uri", oauthHandler.GetRedirectURL)
+		oAuthRouter.GET("/google/callback", oauthHandler.HandleGoogleCallback)
+	}
 }
 
 func Start(addr string) error {

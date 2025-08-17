@@ -4,6 +4,8 @@ import (
 	"log"
 
 	"github.com/Cognize-AI/client-cognize/config"
+	"github.com/Cognize-AI/client-cognize/internal/oauth"
+	"github.com/Cognize-AI/client-cognize/internal/user"
 	"github.com/Cognize-AI/client-cognize/logger"
 	"github.com/Cognize-AI/client-cognize/router"
 	"go.uber.org/zap"
@@ -33,6 +35,15 @@ func init() {
 }
 
 func main() {
-	router.InitRouter()
+	userSvc := user.NewService()
+	oauthSvc := oauth.NewService()
+
+	userHandler := user.NewHandler(userSvc)
+	oauthHandler := oauth.NewHandler(oauthSvc)
+
+	router.InitRouter(
+		userHandler,
+		oauthHandler,
+	)
 	log.Fatal(router.Start("0.0.0.0:" + Config.PORT))
 }
