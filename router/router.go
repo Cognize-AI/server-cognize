@@ -3,6 +3,7 @@ package router
 import (
 	"net/http"
 
+	"github.com/Cognize-AI/client-cognize/internal/list"
 	"github.com/Cognize-AI/client-cognize/internal/oauth"
 	"github.com/Cognize-AI/client-cognize/internal/user"
 	"github.com/Cognize-AI/client-cognize/middleware"
@@ -15,6 +16,7 @@ var r *gin.Engine
 func InitRouter(
 	userHandler *user.Handler,
 	oauthHandler *oauth.Handler,
+	listHandler *list.Handler,
 ) {
 	r = gin.Default()
 
@@ -41,6 +43,12 @@ func InitRouter(
 	{
 		oAuthRouter.GET("/google/redirect-uri", oauthHandler.GetRedirectURL)
 		oAuthRouter.GET("/google/callback", oauthHandler.HandleGoogleCallback)
+	}
+
+	listRouter := r.Group("/list")
+	{
+		listRouter.GET("/create-default", middleware.RequireAuth, listHandler.CreateDefaultLists)
+		listRouter.GET("/all", middleware.RequireAuth, listHandler.GetLists)
 	}
 }
 
