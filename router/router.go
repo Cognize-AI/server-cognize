@@ -56,6 +56,7 @@ func InitRouter(
 	cardRouter := r.Group("/card")
 	{
 		cardRouter.POST("/create", middleware.RequireAuth, cardHandler.CreateCard)
+		cardRouter.POST("/move", middleware.RequireAuth, cardHandler.MoveCard)
 	}
 }
 

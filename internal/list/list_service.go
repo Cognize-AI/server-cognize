@@ -3,6 +3,7 @@ package list
 import (
 	"context"
 	"errors"
+	"sort"
 	"time"
 
 	"github.com/Cognize-AI/client-cognize/config"
@@ -84,6 +85,7 @@ func (s *service) GetLists(c context.Context, user models.User) (*GetListsRes, e
 
 		for _, _card := range list.Cards {
 			cards = append(cards, card.GetCard{
+				ID:          _card.ID,
 				Name:        _card.Name,
 				Designation: _card.Designation,
 				Email:       _card.Email,
@@ -93,6 +95,10 @@ func (s *service) GetLists(c context.Context, user models.User) (*GetListsRes, e
 				CardOrder:   _card.CardOrder,
 			})
 		}
+
+		sort.Slice(cards, func(i, j int) bool {
+			return cards[i].CardOrder < cards[j].CardOrder
+		})
 
 		resLists = append(resLists, CardListResponse{
 			ID:        list.ID,
@@ -104,6 +110,10 @@ func (s *service) GetLists(c context.Context, user models.User) (*GetListsRes, e
 			Cards:     cards,
 		})
 	}
+
+	sort.Slice(resLists, func(i, j int) bool {
+		return resLists[i].ListOrder < resLists[j].ListOrder
+	})
 
 	return &GetListsRes{Lists: resLists}, nil
 }

@@ -42,3 +42,28 @@ func (h *Handler) CreateCard(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": res})
 	return
 }
+
+func (h *Handler) MoveCard(c *gin.Context) {
+	user, exists := c.Get("user")
+	if !exists {
+		logger.Logger.Warn("Failed to get user from context : UNAUTHORIZED")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	currentUser := user.(models.User)
+
+	var req MoveCardReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := h.Service.MoveCard(c, req, currentUser)
+	if err != nil {
+		logger.Logger.Error("Error moving card :", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": "ok"})
+}
