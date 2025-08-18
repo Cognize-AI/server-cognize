@@ -3,6 +3,7 @@ package router
 import (
 	"net/http"
 
+	"github.com/Cognize-AI/client-cognize/internal/card"
 	"github.com/Cognize-AI/client-cognize/internal/list"
 	"github.com/Cognize-AI/client-cognize/internal/oauth"
 	"github.com/Cognize-AI/client-cognize/internal/user"
@@ -17,6 +18,7 @@ func InitRouter(
 	userHandler *user.Handler,
 	oauthHandler *oauth.Handler,
 	listHandler *list.Handler,
+	cardHandler *card.Handler,
 ) {
 	r = gin.Default()
 
@@ -49,6 +51,11 @@ func InitRouter(
 	{
 		listRouter.GET("/create-default", middleware.RequireAuth, listHandler.CreateDefaultLists)
 		listRouter.GET("/all", middleware.RequireAuth, listHandler.GetLists)
+	}
+
+	cardRouter := r.Group("/card")
+	{
+		cardRouter.POST("/create", middleware.RequireAuth, cardHandler.CreateCard)
 	}
 }
 

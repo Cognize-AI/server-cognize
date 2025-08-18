@@ -6,8 +6,9 @@ type List struct {
 	gorm.Model
 	Name      string
 	Color     string
-	UserID    uint `gorm:"index"`
-	ListOrder uint `gorm:"autoIncrement"`
+	UserID    uint    `gorm:"index"`
+	ListOrder float64 `gorm:"type:decimal(10,2);index"`
 
-	User User `gorm:"foreignKey:UserID;references:ID"`
+	User  User   `gorm:"foreignKey:UserID;references:ID"`
+	Cards []Card `gorm:"foreignKey:ListID;references:ID"`
 }

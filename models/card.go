@@ -9,7 +9,8 @@ type Card struct {
 	Email       string `gorm:"index"`
 	Phone       string
 	ImageURL    string
-	ListID      uint `gorm:"index"`
+	ListID      uint    `gorm:"index"`
+	CardOrder   float64 `gorm:"type:decimal(10,2);index"`
 
 	List List `gorm:"foreignKey:ListID;references:ID"`
 }

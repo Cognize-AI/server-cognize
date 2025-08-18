@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Cognize-AI/client-cognize/config"
+	"github.com/Cognize-AI/client-cognize/internal/card"
 	"github.com/Cognize-AI/client-cognize/logger"
 	"github.com/Cognize-AI/client-cognize/models"
 	"gorm.io/gorm"
@@ -71,18 +72,36 @@ func (s *service) CreateDefaultLists(c context.Context, user models.User) (*Crea
 
 func (s *service) GetLists(c context.Context, user models.User) (*GetListsRes, error) {
 	var lists []models.List
-	var resLists []ListResponse
+	var resLists []CardListResponse
 
-	s.DB.Find(&lists).Where("user_id = ?", user.ID)
+	s.DB.
+		Where("user_id = ?", user.ID).
+		Preload("Cards").
+		Find(&lists)
 
 	for _, list := range lists {
-		resLists = append(resLists, ListResponse{
+		var cards []card.GetCard
+
+		for _, _card := range list.Cards {
+			cards = append(cards, card.GetCard{
+				Name:        _card.Name,
+				Designation: _card.Designation,
+				Email:       _card.Email,
+				Phone:       _card.Phone,
+				ImageURL:    _card.ImageURL,
+				ListID:      _card.ListID,
+				CardOrder:   _card.CardOrder,
+			})
+		}
+
+		resLists = append(resLists, CardListResponse{
 			ID:        list.ID,
 			Name:      list.Name,
 			Color:     list.Color,
 			ListOrder: list.ListOrder,
 			CreatedAt: list.CreatedAt,
 			UpdatedAt: list.UpdatedAt,
+			Cards:     cards,
 		})
 	}
 

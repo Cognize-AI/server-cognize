@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/Cognize-AI/client-cognize/config"
+	"github.com/Cognize-AI/client-cognize/internal/card"
 	"github.com/Cognize-AI/client-cognize/internal/list"
 	"github.com/Cognize-AI/client-cognize/internal/oauth"
 	"github.com/Cognize-AI/client-cognize/internal/user"
@@ -39,15 +40,18 @@ func main() {
 	userSvc := user.NewService()
 	oauthSvc := oauth.NewService()
 	listSvc := list.NewService()
+	cardSvc := card.NewService()
 
 	userHandler := user.NewHandler(userSvc)
 	oauthHandler := oauth.NewHandler(oauthSvc)
 	listHandler := list.NewHandler(listSvc)
+	cardHandler := card.NewHandler(cardSvc)
 
 	router.InitRouter(
 		userHandler,
 		oauthHandler,
 		listHandler,
+		cardHandler,
 	)
 	log.Fatal(router.Start("0.0.0.0:" + Config.PORT))
 }
