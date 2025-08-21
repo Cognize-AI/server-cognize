@@ -29,7 +29,7 @@ func (s *service) CreateDefaultLists(c context.Context, user models.User) (*Crea
 	var lists []models.List
 	var resLists []ListResponse
 
-	s.DB.Find(&lists).Where("user_id = ?", user.ID)
+	s.DB.Where("user_id = ?", user.ID).Find(&lists)
 	if len(lists) > 0 {
 		return nil, errors.New("default lists already exists")
 	}
