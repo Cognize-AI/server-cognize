@@ -69,6 +69,7 @@ func (s *service) GetAllTags(ctx context.Context, user models.User) (*GetAllTags
 	s.DB.Where("user_id = ?", user.ID).Find(&tags)
 	for _, tag := range tags {
 		respTags = append(respTags, RespTag{
+			tag.ID,
 			tag.Name,
 			tag.Color,
 		})

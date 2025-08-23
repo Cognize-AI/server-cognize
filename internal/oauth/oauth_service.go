@@ -96,6 +96,32 @@ func (s *service) HandleGoogleCallback(c context.Context, req *HandleGoogleCallb
 		user.ProfilePicture = googleUser.Picture
 		s.DB.Save(&user)
 	}
+	var tags []models.Tag
+	s.DB.Where("user_id = ?", user.ID).Find(&tags)
+	if len(tags) == 0 {
+		tags = append(tags, models.Tag{
+			Name:   "New Leads",
+			Color:  "#A78BFA",
+			UserID: user.ID,
+		}, models.Tag{
+			Name:   "Follow Up",
+			Color:  "#FCA5A5",
+			UserID: user.ID,
+		}, models.Tag{
+			Name:   "Qualified",
+			Color:  "#34D399",
+			UserID: user.ID,
+		}, models.Tag{
+			Name:   "In Negotiation",
+			Color:  "#60A5FA",
+			UserID: user.ID,
+		}, models.Tag{
+			Name:   "High Priority",
+			Color:  "#FBBF24",
+			UserID: user.ID,
+		})
+		s.DB.Create(&tags)
+	}
 
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":  user.ID,

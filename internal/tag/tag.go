@@ -21,6 +21,7 @@ type AddTagReq struct {
 }
 
 type RespTag struct {
+	ID    uint   `json:"id"`
 	Name  string `json:"name"`
 	Color string `json:"color"`
 }
@@ -28,6 +29,16 @@ type RespTag struct {
 type GetAllTagsResp struct {
 	Tags []RespTag `json:"tags"`
 }
+
+//🌸 Pastel Pink → #F8BBD0
+//
+//🌿 Mint Green → #B2EBF2
+//
+//🌼 Soft Yellow → #FFF9C4
+//
+//🌊 Baby Blue → #BBDEFB
+//
+//🍑 Peach → #FFE0B2
 
 type Service interface {
 	CreateTag(ctx context.Context, req CreateTagReq, user models.User) (*CreateTagResp, error)
