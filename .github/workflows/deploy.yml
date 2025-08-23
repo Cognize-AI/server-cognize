@@ -18,9 +18,12 @@ jobs:
         with:
           go-version: 1.24.6   # ✅ use your required Go version
 
+      - name: Debug repo structure
+        run: ls -R
+
       - name: Build Go binary
         run: |
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o server ./server-cognize
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o server .
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
