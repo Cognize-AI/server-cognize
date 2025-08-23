@@ -6,6 +6,7 @@ import (
 	"github.com/Cognize-AI/client-cognize/internal/card"
 	"github.com/Cognize-AI/client-cognize/internal/list"
 	"github.com/Cognize-AI/client-cognize/internal/oauth"
+	"github.com/Cognize-AI/client-cognize/internal/tag"
 	"github.com/Cognize-AI/client-cognize/internal/user"
 	"github.com/Cognize-AI/client-cognize/middleware"
 	"github.com/gin-contrib/cors"
@@ -19,6 +20,7 @@ func InitRouter(
 	oauthHandler *oauth.Handler,
 	listHandler *list.Handler,
 	cardHandler *card.Handler,
+	tagHandler *tag.Handler,
 ) {
 	r = gin.Default()
 
@@ -59,6 +61,13 @@ func InitRouter(
 		cardRouter.POST("/move", middleware.RequireAuth, cardHandler.MoveCard)
 		cardRouter.DELETE("/:id", middleware.RequireAuth, cardHandler.DeleteCard)
 		cardRouter.PUT("/:id", middleware.RequireAuth, cardHandler.UpdateCard)
+	}
+
+	tagRouter := r.Group("/tag")
+	{
+		tagRouter.POST("/create", middleware.RequireAuth, tagHandler.CreateTag)
+		tagRouter.POST("/add-to-card", middleware.RequireAuth, tagHandler.AddTag)
+		tagRouter.GET("/", middleware.RequireAuth, tagHandler.GetAllTags)
 	}
 }
 

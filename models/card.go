@@ -12,5 +12,6 @@ type Card struct {
 	ListID      uint    `gorm:"index"`
 	CardOrder   float64 `gorm:"type:decimal(20,10);index"`
 
-	List List `gorm:"foreignKey:ListID;references:ID"`
+	List List  `gorm:"foreignKey:ListID;references:ID"`
+	Tags []Tag `gorm:"many2many:card_tags;"`
 }

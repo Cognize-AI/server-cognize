@@ -7,6 +7,7 @@ func SyncDB() {
 		models.User{},
 		models.List{},
 		models.Card{},
+		models.Tag{},
 	)
 	if err != nil {
 		return
