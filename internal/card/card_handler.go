@@ -67,3 +67,55 @@ func (h *Handler) MoveCard(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": "ok"})
 }
+
+func (h *Handler) DeleteCard(c *gin.Context) {
+	user, exists := c.Get("user")
+	if !exists {
+		logger.Logger.Warn("Failed to get user from context : UNAUTHORIZED")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	currentUser := user.(models.User)
+	var req DeleteCardReq
+	if err := c.ShouldBindUri(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if _, err := h.Service.DeleteCard(c, req, currentUser); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": "ok"})
+}
+
+func (h *Handler) UpdateCard(c *gin.Context) {
+	user, exists := c.Get("user")
+	if !exists {
+		logger.Logger.Warn("Failed to get user from context : UNAUTHORIZED")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	currentUser := user.(models.User)
+	var req UpdateCardReq
+	if err := c.ShouldBindUri(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	_, err := h.Service.UpdateCard(c, req, currentUser)
+	if err != nil {
+		logger.Logger.Error("Error updating card :", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": "ok"})
+}

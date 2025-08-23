@@ -68,6 +68,30 @@ func (s *service) HandleGoogleCallback(c context.Context, req *HandleGoogleCallb
 			ProfilePicture: googleUser.Picture,
 		}
 		s.DB.Create(&user)
+		var lists []models.List
+
+		lists = append(lists, models.List{
+			Name:   "New Leads",
+			Color:  "#F9BA0B",
+			UserID: user.ID,
+		})
+		lists = append(lists, models.List{
+			Name:   "Signed In",
+			Color:  "#40C2FC",
+			UserID: user.ID,
+		})
+		lists = append(lists, models.List{
+			Name:   "Qualified",
+			Color:  "#75C699",
+			UserID: user.ID,
+		})
+		lists = append(lists, models.List{
+			Name:   "Rejected",
+			Color:  "#EB695B",
+			UserID: user.ID,
+		})
+
+		s.DB.Create(&lists)
 	} else {
 		user.ProfilePicture = googleUser.Picture
 		s.DB.Save(&user)

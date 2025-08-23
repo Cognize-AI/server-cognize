@@ -2,6 +2,7 @@ package card
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math"
 	"strconv"
@@ -29,7 +30,7 @@ func NewService() Service {
 func RebalanceCards(db *gorm.DB, listID uint, userID uint) error {
 	var cards []models.Card
 	if err := db.
-		Where("list_id = ? AND user_id = ?", listID, userID).
+		Where("list_id = ?", listID).
 		Order("card_order ASC").
 		Find(&cards).Error; err != nil {
 		return err
@@ -69,6 +70,7 @@ func (s *service) CreateCard(ctx context.Context, req CreateCardReq, user models
 func (s *service) MoveCard(ctx context.Context, req MoveCardReq, user models.User) error {
 	var prevCard, nextCard, currCard models.Card
 
+	// Load prev card if provided
 	if req.PrevCard != 0 {
 		if err := s.DB.
 			Where("id = ?", req.PrevCard).
@@ -92,17 +94,87 @@ func (s *service) MoveCard(ctx context.Context, req MoveCardReq, user models.Use
 	}
 	currCard.ListID = req.ListID
 
-	if math.Abs(nextCard.CardOrder-prevCard.CardOrder) <= 1e-9 {
-		err := RebalanceCards(s.DB, req.ListID, user.ID)
-		if err != nil {
-			return err
+	// Decide new order
+	if req.PrevCard != 0 && req.NextCard != 0 {
+		// Case 1: Move between two cards
+		if math.Abs(nextCard.CardOrder-prevCard.CardOrder) <= 1e-9 {
+			// Rebalance list if gap is too small
+			if err := RebalanceCards(s.DB, req.ListID, user.ID); err != nil {
+				return fmt.Errorf("failed to rebalance cards: %w", err)
+			}
+			// Reload neighbors after rebalance
+			if err := s.DB.Where("id = ?", req.PrevCard).First(&prevCard).Error; err != nil {
+				return fmt.Errorf("previous card not found after rebalance: %w", err)
+			}
+			if err := s.DB.Where("id = ?", req.NextCard).First(&nextCard).Error; err != nil {
+				return fmt.Errorf("next card not found after rebalance: %w", err)
+			}
 		}
+		currCard.CardOrder = (nextCard.CardOrder + prevCard.CardOrder) / 2
+
+	} else if req.PrevCard == 0 && req.NextCard != 0 {
+		// Case 2: Insert at beginning
+		currCard.CardOrder = nextCard.CardOrder - 1
+
+	} else if req.NextCard == 0 && req.PrevCard != 0 {
+		// Case 3: Insert at end
+		currCard.CardOrder = prevCard.CardOrder + 1
+
+	} else {
+		// Case 4: Only card in the list
+		currCard.CardOrder = 1
 	}
 
-	currCard.CardOrder = (nextCard.CardOrder + prevCard.CardOrder) / 2
 	if err := s.DB.Save(&currCard).Error; err != nil {
-		return err
+		return fmt.Errorf("failed to update card: %w", err)
 	}
 
 	return nil
+}
+
+func (s *service) DeleteCard(ctx context.Context, req DeleteCardReq, user models.User) (*DeleteCardResp, error) {
+	var card models.Card
+	s.DB.Preload("List").Where("id = ?", req.ID).First(&card)
+	if card.ID == 0 {
+		logger.Logger.Error("list not found for card_id: ", zap.String("card_id", strconv.Itoa(int(req.ID))))
+		return nil, errors.New("list not found for card_id: " + strconv.Itoa(int(req.ID)))
+	}
+	if card.List.UserID != user.ID {
+		logger.Logger.Error("card_id not found for user_id: ", zap.String("user_id", strconv.Itoa(int(user.ID))))
+		return nil, errors.New("card not found for user")
+	}
+
+	if err := s.DB.Delete(&card).Error; err != nil {
+		logger.Logger.Error("Error deleting card", zap.Error(err))
+		return nil, fmt.Errorf("failed to delete card: %w", err)
+	}
+	return &DeleteCardResp{
+		card.ID,
+	}, nil
+}
+
+func (s *service) UpdateCard(ctx context.Context, req UpdateCardReq, user models.User) (*UpdateCardResp, error) {
+	var card models.Card
+	s.DB.Preload("List").Where("id = ?", req.ID).First(&card)
+	if card.ID == 0 {
+		logger.Logger.Error("card not found for card_id: ", zap.String("card_id", strconv.Itoa(int(req.ID))))
+		return nil, errors.New("card not found for card_id: " + strconv.Itoa(int(req.ID)))
+	}
+	if card.List.ID == 0 {
+		logger.Logger.Error("list not found for card_id: ", zap.String("card_id", strconv.Itoa(int(req.ID))))
+		return nil, errors.New("list not found for card_id: " + strconv.Itoa(int(req.ID)))
+	}
+	if card.List.UserID != user.ID {
+		logger.Logger.Error("card_id not found for user_id: ", zap.String("user_id", strconv.Itoa(int(user.ID))))
+		return nil, errors.New("card not found for user")
+	}
+
+	card.Name = req.Name
+	card.Designation = req.Designation
+	card.Email = req.Email
+	card.Phone = req.Phone
+	card.ImageURL = req.ImageURL
+
+	s.DB.Save(&card)
+	return &UpdateCardResp{card.ID}, nil
 }

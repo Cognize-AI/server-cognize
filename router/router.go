@@ -24,7 +24,7 @@ func InitRouter(
 
 	r.Use(cors.New(cors.Config{
 		AllowOriginFunc: func(origin string) bool {
-			return origin == "http://localhost:3000"
+			return origin == "http://localhost:3000" || origin == "https://client-cognize.vercel.app"
 		},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
@@ -57,6 +57,8 @@ func InitRouter(
 	{
 		cardRouter.POST("/create", middleware.RequireAuth, cardHandler.CreateCard)
 		cardRouter.POST("/move", middleware.RequireAuth, cardHandler.MoveCard)
+		cardRouter.DELETE("/:id", middleware.RequireAuth, cardHandler.DeleteCard)
+		cardRouter.PUT("/:id", middleware.RequireAuth, cardHandler.UpdateCard)
 	}
 }
 

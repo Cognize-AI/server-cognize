@@ -27,7 +27,7 @@ func NewService() Service {
 
 func (s *service) CreateDefaultLists(c context.Context, user models.User) (*CreateDefaultListsRes, error) {
 	var lists []models.List
-	var resLists []ListResponse
+	var resLists []GetListResponse
 
 	s.DB.Where("user_id = ?", user.ID).Find(&lists)
 	if len(lists) > 0 {
@@ -58,7 +58,7 @@ func (s *service) CreateDefaultLists(c context.Context, user models.User) (*Crea
 	s.DB.Create(&lists)
 
 	for _, list := range lists {
-		resLists = append(resLists, ListResponse{
+		resLists = append(resLists, GetListResponse{
 			ID:        list.ID,
 			Name:      list.Name,
 			Color:     list.Color,

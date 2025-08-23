@@ -37,7 +37,31 @@ type MoveCardReq struct {
 	ListID   uint `json:"list_id"`
 }
 
+type DeleteCardReq struct {
+	ID uint `uri:"id" binding:"required"`
+}
+
+type DeleteCardResp struct {
+	ID uint `json:"id"`
+}
+
+type UpdateCardReq struct {
+	ID          uint   `uri:"id" binding:"required"`
+	Name        string `json:"name"`
+	Designation string `json:"designation"`
+	Email       string `json:"email"`
+	Phone       string `json:"phone"`
+	ImageURL    string `json:"image_url"`
+	ListID      uint   `json:"list_id"`
+}
+
+type UpdateCardResp struct {
+	ID uint `uri:"id"`
+}
+
 type Service interface {
 	CreateCard(ctx context.Context, req CreateCardReq, user models.User) (*CreateCardResp, error)
 	MoveCard(ctx context.Context, req MoveCardReq, user models.User) error
+	DeleteCard(ctx context.Context, req DeleteCardReq, user models.User) (*DeleteCardResp, error)
+	UpdateCard(ctx context.Context, req UpdateCardReq, user models.User) (*UpdateCardResp, error)
 }

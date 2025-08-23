@@ -8,7 +8,7 @@ import (
 	"github.com/Cognize-AI/client-cognize/models"
 )
 
-type ListResponse struct {
+type GetListResponse struct {
 	ID        uint      `json:"id"`
 	Name      string    `json:"name"`
 	Color     string    `json:"color"`
@@ -28,7 +28,7 @@ type CardListResponse struct {
 }
 
 type CreateDefaultListsRes struct {
-	Lists []ListResponse `json:"lists"`
+	Lists []GetListResponse `json:"lists"`
 }
 
 type GetListsRes struct {
