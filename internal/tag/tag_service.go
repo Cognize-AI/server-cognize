@@ -77,3 +77,31 @@ func (s *service) GetAllTags(ctx context.Context, user models.User) (*GetAllTags
 
 	return &GetAllTagsResp{respTags}, nil
 }
+
+func (s *service) DeleteTag(ctx context.Context, req DeleteTagReq, user models.User) error {
+	var tag models.Tag
+	s.DB.Where("id = ? AND user_id = ?", req.TagID, user.ID).First(&tag)
+	if tag.ID == 0 {
+		logger.Logger.Error("tag not exist", zap.String("tag_id", strconv.Itoa(int(tag.ID))))
+		return errors.New("tag not exist")
+	}
+
+	s.DB.Delete(&tag)
+	return nil
+}
+
+func (s *service) EditTag(ctx context.Context, req EditTagReq, user models.User) (*EditTagResp, error) {
+	var tag models.Tag
+	s.DB.Where("id = ? AND user_id = ?", req.TagID, user.ID).First(&tag)
+	if tag.ID == 0 {
+		logger.Logger.Error("tag not exist", zap.String("tag_id", strconv.Itoa(int(tag.ID))))
+		return nil, errors.New("tag not exist")
+	}
+
+	tag.Name = req.Name
+	s.DB.Save(&tag)
+
+	return &EditTagResp{
+		tag.ID,
+	}, nil
+}

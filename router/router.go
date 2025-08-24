@@ -68,6 +68,8 @@ func InitRouter(
 		tagRouter.POST("/create", middleware.RequireAuth, tagHandler.CreateTag)
 		tagRouter.POST("/add-to-card", middleware.RequireAuth, tagHandler.AddTag)
 		tagRouter.GET("/", middleware.RequireAuth, tagHandler.GetAllTags)
+		tagRouter.DELETE("/:id", middleware.RequireAuth, tagHandler.DeleteTag)
+		tagRouter.PUT("/", middleware.RequireAuth, tagHandler.EditTag)
 	}
 }
 

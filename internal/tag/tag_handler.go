@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/Cognize-AI/client-cognize/logger"
-	"github.com/Cognize-AI/client-cognize/models"
+	"github.com/Cognize-AI/client-cognize/util"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -18,13 +18,10 @@ func NewHandler(s Service) *Handler {
 }
 
 func (h *Handler) CreateTag(c *gin.Context) {
-	user, exists := c.Get("user")
-	if !exists {
-		logger.Logger.Warn("Failed to get user from context : UNAUTHORIZED")
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+	currentUser, valid := util.GetCurrentUser(c)
+	if !valid {
 		return
 	}
-	currentUser := user.(models.User)
 
 	var req CreateTagReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -43,13 +40,10 @@ func (h *Handler) CreateTag(c *gin.Context) {
 }
 
 func (h *Handler) AddTag(c *gin.Context) {
-	user, exists := c.Get("user")
-	if !exists {
-		logger.Logger.Warn("Failed to get user from context : UNAUTHORIZED")
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+	currentUser, valid := util.GetCurrentUser(c)
+	if !valid {
 		return
 	}
-	currentUser := user.(models.User)
 
 	var req AddTagReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -68,14 +62,11 @@ func (h *Handler) AddTag(c *gin.Context) {
 }
 
 func (h *Handler) GetAllTags(c *gin.Context) {
-	user, exists := c.Get("user")
-	if !exists {
-		logger.Logger.Warn("Failed to get user from context : UNAUTHORIZED")
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+	currentUser, valid := util.GetCurrentUser(c)
+	if !valid {
 		return
 	}
 
-	currentUser := user.(models.User)
 	tags, err := h.Service.GetAllTags(c, currentUser)
 	if err != nil {
 		logger.Logger.Error("Error getting tags: ", zap.Error(err))
@@ -84,4 +75,49 @@ func (h *Handler) GetAllTags(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"data": tags})
+}
+
+func (h *Handler) DeleteTag(c *gin.Context) {
+	currentUser, valid := util.GetCurrentUser(c)
+	if !valid {
+		return
+	}
+
+	var req DeleteTagReq
+	if err := c.ShouldBindUri(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := h.Service.DeleteTag(c, req, currentUser)
+
+	if err != nil {
+		logger.Logger.Error("Error deleting tag: ", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": "ok"})
+}
+
+func (h *Handler) EditTag(c *gin.Context) {
+	currentUser, valid := util.GetCurrentUser(c)
+	if !valid {
+		return
+	}
+
+	var req EditTagReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	res, err := h.Service.EditTag(c, req, currentUser)
+	if err != nil {
+		logger.Logger.Error("Error editing tag: ", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": res})
 }
