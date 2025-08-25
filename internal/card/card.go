@@ -3,18 +3,20 @@ package card
 import (
 	"context"
 
+	"github.com/Cognize-AI/client-cognize/internal/tag"
 	"github.com/Cognize-AI/client-cognize/models"
 )
 
 type GetCard struct {
-	ID          uint    `json:"id"`
-	Name        string  `json:"name"`
-	Designation string  `json:"designation"`
-	Email       string  `json:"email"`
-	Phone       string  `json:"phone"`
-	ImageURL    string  `json:"image_url"`
-	ListID      uint    `gorm:"index"`
-	CardOrder   float64 `gorm:"autoIncrement"`
+	ID          uint          `json:"id"`
+	Name        string        `json:"name"`
+	Designation string        `json:"designation"`
+	Email       string        `json:"email"`
+	Phone       string        `json:"phone"`
+	ImageURL    string        `json:"image_url"`
+	ListID      uint          `gorm:"index"`
+	CardOrder   float64       `gorm:"autoIncrement"`
+	Tags        []tag.RespTag `json:"tags"`
 }
 
 type CreateCardReq struct {

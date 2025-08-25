@@ -8,6 +8,7 @@ import (
 
 	"github.com/Cognize-AI/client-cognize/config"
 	"github.com/Cognize-AI/client-cognize/internal/card"
+	"github.com/Cognize-AI/client-cognize/internal/tag"
 	"github.com/Cognize-AI/client-cognize/logger"
 	"github.com/Cognize-AI/client-cognize/models"
 	"gorm.io/gorm"
@@ -76,14 +77,22 @@ func (s *service) GetLists(c context.Context, user models.User) (*GetListsRes, e
 	var resLists []CardListResponse
 
 	s.DB.
+		Preload("Cards.Tags").
 		Where("user_id = ?", user.ID).
-		Preload("Cards").
 		Find(&lists)
 
 	for _, list := range lists {
 		var cards []card.GetCard
 
 		for _, _card := range list.Cards {
+			var tags []tag.RespTag
+			for _, _tag := range _card.Tags {
+				tags = append(tags, tag.RespTag{
+					ID:    _tag.ID,
+					Name:  _tag.Name,
+					Color: _tag.Color,
+				})
+			}
 			cards = append(cards, card.GetCard{
 				ID:          _card.ID,
 				Name:        _card.Name,
@@ -93,6 +102,7 @@ func (s *service) GetLists(c context.Context, user models.User) (*GetListsRes, e
 				ImageURL:    _card.ImageURL,
 				ListID:      _card.ListID,
 				CardOrder:   _card.CardOrder,
+				Tags:        tags,
 			})
 		}
 

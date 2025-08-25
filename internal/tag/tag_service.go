@@ -54,6 +54,17 @@ func (s *service) AddTag(ctx context.Context, req AddTagReq, user models.User) e
 		return errors.New("tag doesnt exists")
 	}
 
+	var existingTags []models.Tag
+	if err := s.DB.Model(&card).Association("Tags").Find(&existingTags); err != nil {
+		return err
+	}
+
+	for _, t := range existingTags {
+		if t.ID == tag.ID {
+			return nil
+		}
+	}
+
 	err := s.DB.Model(&card).Association("Tags").Append(&tag)
 	if err != nil {
 		return err
