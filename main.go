@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/Cognize-AI/client-cognize/config"
 	"github.com/Cognize-AI/client-cognize/internal/card"
@@ -38,6 +39,18 @@ func main() {
 
 		}
 	}(logger.Logger)
+
+	go func() {
+		ticker := time.NewTicker(5 * time.Second) // flush every 5s
+		defer ticker.Stop()
+		for range ticker.C {
+			if err := logger.Logger.Sync(); err != nil {
+				logger.Logger.Error("failed to sync logs", zap.Error(err))
+			} else {
+				logger.Logger.Debug("log buffer flushed to Axiom")
+			}
+		}
+	}()
 
 	userSvc := user.NewService()
 	oauthSvc := oauth.NewService()
