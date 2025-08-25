@@ -70,6 +70,7 @@ func InitRouter(
 		tagRouter.GET("/", middleware.RequireAuth, tagHandler.GetAllTags)
 		tagRouter.DELETE("/:id", middleware.RequireAuth, tagHandler.DeleteTag)
 		tagRouter.PUT("/", middleware.RequireAuth, tagHandler.EditTag)
+		tagRouter.POST("/remove-from-card", middleware.RequireAuth, tagHandler.RemoveTagAssociation)
 	}
 }
 

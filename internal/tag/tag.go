@@ -43,6 +43,11 @@ type EditTagResp struct {
 	ID uint `json:"id"`
 }
 
+type RemoveTagReq struct {
+	TagID  uint `json:"tag_id"`
+	CardID uint `json:"card_id"`
+}
+
 //🌸 Pastel Pink → #F8BBD0
 //
 //🌿 Mint Green → #B2EBF2
@@ -59,4 +64,5 @@ type Service interface {
 	GetAllTags(ctx context.Context, user models.User) (*GetAllTagsResp, error)
 	DeleteTag(ctx context.Context, req DeleteTagReq, user models.User) error
 	EditTag(ctx context.Context, req EditTagReq, user models.User) (*EditTagResp, error)
+	RemoveTagAssociation(ctx context.Context, req RemoveTagReq, user models.User) error
 }

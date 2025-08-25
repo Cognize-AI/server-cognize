@@ -10,6 +10,7 @@ import (
 	"github.com/Cognize-AI/client-cognize/logger"
 	"github.com/Cognize-AI/client-cognize/models"
 	"go.uber.org/zap"
+	"golang.org/x/sync/errgroup"
 	"gorm.io/gorm"
 )
 
@@ -115,4 +116,40 @@ func (s *service) EditTag(ctx context.Context, req EditTagReq, user models.User)
 	return &EditTagResp{
 		tag.ID,
 	}, nil
+}
+
+func (s *service) RemoveTagAssociation(ctx context.Context, req RemoveTagReq, user models.User) error {
+	var card models.Card
+	var tag models.Tag
+
+	g, ctx := errgroup.WithContext(ctx)
+
+	// fetch card
+	g.Go(func() error {
+		return s.DB.Preload("List").Where("id = ?", req.CardID).First(&card).Error
+	})
+
+	// fetch tag
+	g.Go(func() error {
+		return s.DB.Where("id = ?", req.TagID).First(&tag).Error
+	})
+
+	// wait for both
+	if err := g.Wait(); err != nil {
+		return err
+	}
+
+	// ownership checks
+	if card.List.UserID != user.ID {
+		return errors.New("card not exist")
+	}
+	if tag.UserID != user.ID {
+		return errors.New("tag doesnt exists")
+	}
+
+	if err := s.DB.Model(&card).Association("Tags").Delete(&tag); err != nil {
+		return err
+	}
+
+	return nil
 }
