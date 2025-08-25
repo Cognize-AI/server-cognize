@@ -41,14 +41,10 @@ func main() {
 	}(logger.Logger)
 
 	go func() {
-		ticker := time.NewTicker(5 * time.Second) // flush every 5s
+		ticker := time.NewTicker(5 * time.Second)
 		defer ticker.Stop()
 		for range ticker.C {
-			if err := logger.Logger.Sync(); err != nil {
-				logger.Logger.Error("failed to sync logs", zap.Error(err))
-			} else {
-				logger.Logger.Debug("log buffer flushed to Axiom")
-			}
+			_ = logger.Logger.Sync()
 		}
 	}()
 
