@@ -8,6 +8,7 @@ import (
 	"github.com/Cognize-AI/client-cognize/internal/oauth"
 	"github.com/Cognize-AI/client-cognize/internal/tag"
 	"github.com/Cognize-AI/client-cognize/internal/user"
+	"github.com/Cognize-AI/client-cognize/logger"
 	"github.com/Cognize-AI/client-cognize/middleware"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -35,6 +36,7 @@ func InitRouter(
 	}))
 
 	r.GET("/", func(c *gin.Context) {
+		logger.Logger.Info("lol")
 		c.String(http.StatusOK, "Welcome to cognize")
 	})
 

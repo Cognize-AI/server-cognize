@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -15,6 +16,7 @@ var Logger *zap.Logger
 
 func InitLogger(config config.Config) {
 
+	fmt.Println("init logger", config.Environment)
 	if config.Environment == "dev" {
 		devLogger, _ := zap.NewDevelopment()
 		Logger = devLogger
