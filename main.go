@@ -29,15 +29,16 @@ func init() {
 	logger.Logger.Info("DB connection established")
 	config.SyncDB()
 	logger.Logger.Info("DB sync completed")
+}
+
+func main() {
 	defer func(Logger *zap.Logger) {
 		err := Logger.Sync()
 		if err != nil {
 
 		}
 	}(logger.Logger)
-}
 
-func main() {
 	userSvc := user.NewService()
 	oauthSvc := oauth.NewService()
 	listSvc := list.NewService()
