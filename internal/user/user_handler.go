@@ -34,5 +34,5 @@ func (h *Handler) Me(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, gin.H{"data": res})
 }
