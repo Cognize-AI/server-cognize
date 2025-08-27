@@ -71,34 +71,29 @@ func (s *service) HandleGoogleCallback(c context.Context, req *HandleGoogleCallb
 		var lists []models.List
 
 		lists = append(lists, models.List{
-			Name:   "New Leads",
+			Name:   "ux researcher",
 			Color:  "#F9BA0B",
 			UserID: user.ID,
 		})
 		lists = append(lists, models.List{
-			Name:   "Signed In",
+			Name:   "product designer",
 			Color:  "#40C2FC",
 			UserID: user.ID,
 		})
 		lists = append(lists, models.List{
-			Name:   "Qualified",
+			Name:   "content strategist",
 			Color:  "#75C699",
 			UserID: user.ID,
 		})
 		lists = append(lists, models.List{
-			Name:   "Rejected",
+			Name:   "social media manager",
 			Color:  "#EB695B",
 			UserID: user.ID,
 		})
 
 		s.DB.Create(&lists)
-	} else {
-		user.ProfilePicture = googleUser.Picture
-		s.DB.Save(&user)
-	}
-	var tags []models.Tag
-	s.DB.Where("user_id = ?", user.ID).Find(&tags)
-	if len(tags) == 0 {
+
+		var tags []models.Tag
 		tags = append(tags, models.Tag{
 			Name:   "New Leads",
 			Color:  "#A78BFA",
@@ -121,6 +116,9 @@ func (s *service) HandleGoogleCallback(c context.Context, req *HandleGoogleCallb
 			UserID: user.ID,
 		})
 		s.DB.Create(&tags)
+	} else {
+		user.ProfilePicture = googleUser.Picture
+		s.DB.Save(&user)
 	}
 
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
