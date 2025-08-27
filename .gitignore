@@ -1,3 +1,34 @@
+# Environment files
 .env
-/tmp
+.env.local
+.env.prod
+
+# Build artifacts
+main.exe
+main
+client-cognize
+server-cognize
 server
+*.exe
+
+# Development tools
+/tmp
+.air/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+build-errors.log
+
+# Database backups
+*.sql
+*.dump
