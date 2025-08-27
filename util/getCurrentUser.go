@@ -17,3 +17,13 @@ func GetCurrentUser(c *gin.Context) (models.User, bool) {
 	}
 	return user.(models.User), true
 }
+
+func GetAPIKey(c *gin.Context) (models.Key, bool) {
+	key, exists := c.Get("apiKey")
+	if !exists {
+		logger.Logger.Warn("Failed to get API key from context : UNAUTHORIZED")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return models.Key{}, false
+	}
+	return key.(models.Key), true
+}

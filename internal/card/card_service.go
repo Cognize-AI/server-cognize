@@ -178,3 +178,32 @@ func (s *service) UpdateCard(ctx context.Context, req UpdateCardReq, user models
 	s.DB.Save(&card)
 	return &UpdateCardResp{card.ID}, nil
 }
+
+func (s *service) BulkCreate(ctx context.Context, req BulkCreateReq, key models.Key) (*BulkCreateResp, error) {
+	var cards []models.Card
+	var list models.List
+
+	s.DB.Where("id = ? AND user_id = ?", req.ListID, key.UserID).First(&list)
+	if list.ID == 0 {
+		logger.Logger.Error("list not found for list_id: ", zap.String("list_id", strconv.Itoa(int(req.ListID))))
+		return nil, errors.New("list not found for list_id: " + strconv.Itoa(int(req.ListID)))
+	}
+
+	var maxOrder float64
+	s.DB.Model(&models.Card{}).Select("COALESCE(MAX(card_order), 0)").Scan(&maxOrder)
+
+	for i, prospect := range req.Prospects {
+		cards = append(cards, models.Card{
+			Name:        prospect.Name,
+			Designation: prospect.Designation,
+			Email:       prospect.Email,
+			Phone:       prospect.Phone,
+			ImageURL:    prospect.ImageURL,
+			ListID:      req.ListID,
+			CardOrder:   maxOrder + float64(i+1),
+		})
+	}
+	s.DB.Create(&cards)
+	
+	return nil, nil
+}

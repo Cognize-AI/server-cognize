@@ -19,6 +19,7 @@ type Config struct {
 	AxiomToken              string `mapstructure:"AXIOM_TOKEN"`
 	AxiomOrg                string `mapstructure:"AXIOM_ORG"`
 	AxiomDataset            string `mapstructure:"AXIOM_DATASET"`
+	EncSecret               string `mapstructure:"ENC_SECRET"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

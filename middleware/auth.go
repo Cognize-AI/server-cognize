@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"net/http"
 	"strings"
 	"time"
@@ -74,5 +76,35 @@ func RequireAuth(c *gin.Context) {
 	} else {
 		c.AbortWithStatus(http.StatusUnauthorized)
 	}
+	c.Next()
+}
+
+func RequireAPIKey(c *gin.Context) {
+	apiKey := c.GetHeader("Cognize-API-Key")
+	if apiKey == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "API key required in 'Cognize-API-Key' header"})
+		c.Abort()
+		return
+	}
+
+	hash := sha256.Sum256([]byte(apiKey))
+	hashed := hex.EncodeToString(hash[:])
+
+	var key models.Key
+	if err := config.DB.Where("hash = ?", hashed).First(&key).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid API key"})
+		c.Abort()
+		return
+	}
+
+	// (Optional) check if key is active / expired
+	//if !key.Active {
+	//	c.JSON(http.StatusUnauthorized, gin.H{"error": "API key is inactive"})
+	//	c.Abort()
+	//	return
+	//}
+
+	// Attach key info (or associated user) to context
+	c.Set("apiKey", key)
 	c.Next()
 }

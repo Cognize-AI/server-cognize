@@ -5,7 +5,9 @@ import (
 	"time"
 
 	"github.com/Cognize-AI/client-cognize/config"
+	"github.com/Cognize-AI/client-cognize/db"
 	"github.com/Cognize-AI/client-cognize/internal/card"
+	"github.com/Cognize-AI/client-cognize/internal/keys"
 	"github.com/Cognize-AI/client-cognize/internal/list"
 	"github.com/Cognize-AI/client-cognize/internal/oauth"
 	"github.com/Cognize-AI/client-cognize/internal/tag"
@@ -28,7 +30,7 @@ func init() {
 	logger.Logger.Info("Logger initialized")
 	config.ConnectDB()
 	logger.Logger.Info("DB connection established")
-	config.SyncDB()
+	db.SyncDB()
 	logger.Logger.Info("DB sync completed")
 }
 
@@ -53,12 +55,14 @@ func main() {
 	listSvc := list.NewService()
 	cardSvc := card.NewService()
 	tagSvc := tag.NewService()
+	keySvc := keys.NewService()
 
 	userHandler := user.NewHandler(userSvc)
 	oauthHandler := oauth.NewHandler(oauthSvc)
 	listHandler := list.NewHandler(listSvc)
 	cardHandler := card.NewHandler(cardSvc)
 	tagHandler := tag.NewHandler(tagSvc)
+	keyHandler := keys.NewHandler(keySvc)
 
 	router.InitRouter(
 		userHandler,
@@ -66,6 +70,7 @@ func main() {
 		listHandler,
 		cardHandler,
 		tagHandler,
+		keyHandler,
 	)
 	log.Fatal(router.Start("0.0.0.0:" + Config.PORT))
 }

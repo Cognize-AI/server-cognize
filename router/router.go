@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/Cognize-AI/client-cognize/internal/card"
+	"github.com/Cognize-AI/client-cognize/internal/keys"
 	"github.com/Cognize-AI/client-cognize/internal/list"
 	"github.com/Cognize-AI/client-cognize/internal/oauth"
 	"github.com/Cognize-AI/client-cognize/internal/tag"
@@ -22,6 +23,7 @@ func InitRouter(
 	listHandler *list.Handler,
 	cardHandler *card.Handler,
 	tagHandler *tag.Handler,
+	keyHandler *keys.Handler,
 ) {
 	r = gin.Default()
 
@@ -73,6 +75,16 @@ func InitRouter(
 		tagRouter.DELETE("/:id", middleware.RequireAuth, tagHandler.DeleteTag)
 		tagRouter.PUT("/", middleware.RequireAuth, tagHandler.EditTag)
 		tagRouter.POST("/remove-from-card", middleware.RequireAuth, tagHandler.RemoveTagAssociation)
+	}
+
+	keyRouter := r.Group("/key")
+	{
+		keyRouter.GET("/api", middleware.RequireAuth, keyHandler.CreateAPI)
+	}
+
+	APIRouter := r.Group("/api")
+	{
+		APIRouter.POST("/bulk-prospect", middleware.RequireAPIKey, cardHandler.BulkCreate)
 	}
 }
 

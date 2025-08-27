@@ -5,6 +5,7 @@ import (
 
 	"github.com/Cognize-AI/client-cognize/logger"
 	"github.com/Cognize-AI/client-cognize/models"
+	"github.com/Cognize-AI/client-cognize/util"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -114,6 +115,28 @@ func (h *Handler) UpdateCard(c *gin.Context) {
 	if err != nil {
 		logger.Logger.Error("Error updating card :", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": "ok"})
+}
+
+func (h *Handler) BulkCreate(c *gin.Context) {
+	key, valid := util.GetAPIKey(c)
+	if !valid {
+		return
+	}
+
+	var req BulkCreateReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.Logger.Warn("Failed to bind json :", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	_, err := h.Service.BulkCreate(c, req, key)
+	if err != nil {
+		logger.Logger.Error("Error creating card :", zap.Error(err))
 		return
 	}
 
