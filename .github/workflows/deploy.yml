@@ -3,7 +3,7 @@ name: Deploy Go Server to EC2
 on:
   push:
     branches:
-      - main
+      - main   # or master, whichever you use
 
 jobs:
   deploy:
@@ -16,21 +16,25 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.24.6
+          go-version: 1.24.6   # ✅ use your required Go version
+
+      - name: Debug repo structure
+        run: ls -R
 
       - name: Build Go binary
         run: |
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o server .
 
-      - name: Stop old server
+      - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}   # still ubuntu or ec2-user
+          username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            sudo su - root -c "lsof -t -i:8080 | xargs -r kill -9 || true"
-            sudo su - root -c "rm -f /root/server"
+            # Kill process on port 8080 if running
+            sudo lsof -t -i:8080 | xargs -r sudo kill -9 || true
+            rm -f ~/server
 
       - name: Upload new binary
         uses: appleboy/scp-action@v0.1.7
@@ -39,14 +43,14 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "server"
-          target: "/root/"
+          target: "~/"
 
-      - name: Start server as root
+      - name: Start server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            sudo su - root -c "chmod +x /root/server"
-            sudo su - root -c "cd /root && nohup ./server > server.log 2>&1 &"
+            chmod +x ~/server
+            nohup ~/server > server.log 2>&1 &
