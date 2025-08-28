@@ -142,3 +142,26 @@ func (h *Handler) BulkCreate(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": "ok"})
 }
+
+func (h *Handler) GetCardById(c *gin.Context) {
+	currentUser, valid := util.GetCurrentUser(c)
+	if !valid {
+		return
+	}
+
+	var req GetCardByIDReq
+	if err := c.ShouldBindUri(&req); err != nil {
+		logger.Logger.Warn("Failed to bind json :", zap.Error(err))
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	res, err := h.Service.GetCardByID(c, req, currentUser)
+	if err != nil {
+		logger.Logger.Error("Error getting card :", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": res})
+}

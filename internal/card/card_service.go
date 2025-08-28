@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Cognize-AI/client-cognize/config"
+	"github.com/Cognize-AI/client-cognize/internal/tag"
 	"github.com/Cognize-AI/client-cognize/logger"
 	"github.com/Cognize-AI/client-cognize/models"
 	"go.uber.org/zap"
@@ -204,6 +205,67 @@ func (s *service) BulkCreate(ctx context.Context, req BulkCreateReq, key models.
 		})
 	}
 	s.DB.Create(&cards)
-	
+
 	return nil, nil
+}
+
+func (s *service) GetCardByID(ctx context.Context, req GetCardByIDReq, user models.User) (*GetCardByIDResp, error) {
+	var card models.Card
+	var fieldVals []models.FieldValue
+	var additionalContactDetails []ContactDetails
+	var additionalCompanyDetails []CompanyDetails
+
+	s.DB.Preload("Tags").Preload("List").Where("id = ?", req.ID).First(&card)
+	if card.ID == 0 || card.List.UserID != user.ID {
+		logger.Logger.Error("card_id not found for card_id: ", zap.String("card_id", strconv.Itoa(int(req.ID))))
+		return nil, errors.New("card_id not found for card_id: " + strconv.Itoa(int(req.ID)))
+	}
+
+	s.DB.Preload("FieldDefinition").Where("card_id = ?", card.ID).Find(&fieldVals)
+
+	for _, fieldVal := range fieldVals {
+		if models.FieldDefinitionType(fieldVal.FieldDefinition.Type) == models.CardTypeContact {
+			additionalContactDetails = append(additionalContactDetails, ContactDetails{
+				Name:     fieldVal.FieldDefinition.Name,
+				Value:    fieldVal.Value,
+				DataType: fieldVal.FieldDefinition.DataType,
+			})
+		} else if models.FieldDefinitionType(fieldVal.FieldDefinition.Type) == models.CardTypeCompany {
+			additionalCompanyDetails = append(additionalCompanyDetails, CompanyDetails{
+				Name:     fieldVal.FieldDefinition.Name,
+				Value:    fieldVal.Value,
+				DataType: fieldVal.FieldDefinition.DataType,
+			})
+		}
+	}
+
+	var tags []tag.RespTag
+	for _, _tag := range card.Tags {
+		tags = append(tags, tag.RespTag{
+			ID:    _tag.ID,
+			Name:  _tag.Name,
+			Color: _tag.Color,
+		})
+	}
+
+	var resCard = GetCard{
+		ID:          card.ID,
+		Name:        card.Name,
+		Designation: card.Designation,
+		Email:       card.Email,
+		Phone:       card.Phone,
+		ImageURL:    card.ImageURL,
+		ListID:      card.ListID,
+		CardOrder:   card.CardOrder,
+		Tags:        tags,
+	}
+
+	var res = GetCardByIDResp{
+		resCard,
+		card.List.Name,
+		additionalContactDetails,
+		additionalCompanyDetails,
+	}
+
+	return &res, nil
 }

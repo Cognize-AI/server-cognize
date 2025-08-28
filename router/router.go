@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/Cognize-AI/client-cognize/internal/card"
+	"github.com/Cognize-AI/client-cognize/internal/field"
 	"github.com/Cognize-AI/client-cognize/internal/keys"
 	"github.com/Cognize-AI/client-cognize/internal/list"
 	"github.com/Cognize-AI/client-cognize/internal/oauth"
@@ -24,6 +25,7 @@ func InitRouter(
 	cardHandler *card.Handler,
 	tagHandler *tag.Handler,
 	keyHandler *keys.Handler,
+	fieldHandler *field.Handler,
 ) {
 	r = gin.Default()
 
@@ -65,6 +67,7 @@ func InitRouter(
 		cardRouter.POST("/move", middleware.RequireAuth, cardHandler.MoveCard)
 		cardRouter.DELETE("/:id", middleware.RequireAuth, cardHandler.DeleteCard)
 		cardRouter.PUT("/:id", middleware.RequireAuth, cardHandler.UpdateCard)
+		cardRouter.GET("/:id", middleware.RequireAuth, cardHandler.GetCardById)
 	}
 
 	tagRouter := r.Group("/tag")
@@ -85,6 +88,12 @@ func InitRouter(
 	APIRouter := r.Group("/api")
 	{
 		APIRouter.POST("/bulk-prospect", middleware.RequireAPIKey, cardHandler.BulkCreate)
+	}
+
+	fieldRouter := r.Group("/field")
+	{
+		fieldRouter.POST("/field-definitions", middleware.RequireAuth, fieldHandler.CreateField)
+		fieldRouter.POST("/field-value", middleware.RequireAuth, fieldHandler.InsertFieldVal)
 	}
 }
 

@@ -74,6 +74,29 @@ type BulkCreateReq struct {
 	Prospects []BulkProspect `json:"prospects"`
 }
 
+type GetCardByIDReq struct {
+	ID uint `uri:"id" binding:"required"`
+}
+
+type ContactDetails struct {
+	Name     string `json:"name"`
+	Value    string `json:"value"`
+	DataType string `json:"data_type"`
+}
+
+type CompanyDetails struct {
+	Name     string `json:"name"`
+	Value    string `json:"value"`
+	DataType string `json:"data_type"`
+}
+
+type GetCardByIDResp struct {
+	GetCard
+	ListName          string           `json:"list_name"`
+	AdditionalContact []ContactDetails `json:"additional_contact"`
+	AdditionalCompany []CompanyDetails `json:"additional_company"`
+}
+
 type BulkCreateResp struct {
 }
 
@@ -83,4 +106,5 @@ type Service interface {
 	DeleteCard(ctx context.Context, req DeleteCardReq, user models.User) (*DeleteCardResp, error)
 	UpdateCard(ctx context.Context, req UpdateCardReq, user models.User) (*UpdateCardResp, error)
 	BulkCreate(ctx context.Context, req BulkCreateReq, key models.Key) (*BulkCreateResp, error)
+	GetCardByID(ctx context.Context, req GetCardByIDReq, user models.User) (*GetCardByIDResp, error)
 }
