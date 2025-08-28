@@ -34,30 +34,31 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: root
+          username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            lsof -t -i:8080 | xargs -r kill -9 || true
-            rm -f /root/server || true
+            sudo lsof -t -i:8080 | xargs -r sudo kill -9 || true
+            sudo rm -f /root/server || true
 
       # 6. Upload new binary
       - name: Upload new binary
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: root
+          username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "server"
-          target: "/root/"
+          target: "/home/ubuntu/"
 
-      # 7. Start new server
+      # 7. Move binary to /root/ and start server
       - name: Start server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: root
+          username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            chmod +x /root/server
-            nohup /root/server > /root/server.log 2>&1 &
+            sudo mv /home/ubuntu/server /root/server
+            sudo chmod +x /root/server
+            nohup sudo /root/server > /root/server.log 2>&1 &
             echo "Server started on port 8080"
