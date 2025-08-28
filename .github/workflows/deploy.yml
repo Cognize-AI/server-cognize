@@ -3,47 +3,54 @@ name: Deploy Go Server to EC2
 on:
   push:
     branches:
-      - main   # or master, whichever you use
+      - main   # or master, whichever branch you deploy from
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout repo
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # 2. Setup Go
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.24.6   # ✅ use your required Go version
+          go-version: 1.24.6   # ✅ adjust if you use a different version
 
+      # 3. Debug repo structure (optional)
       - name: Debug repo structure
         run: ls -R
 
+      # 4. Build Go binary for Linux
       - name: Build Go binary
         run: |
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o server .
 
+      # 5. Stop old process & clean old binary
       - name: Stop old server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
+          username: root
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             lsof -t -i:8080 | xargs -r kill -9 || true
-            rm -f /root/server
+            rm -f /root/server || true
 
+      # 6. Upload new binary
       - name: Upload new binary
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
+          username: root
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "server"
           target: "/root/"
 
+      # 7. Start new server
       - name: Start server
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -53,3 +60,4 @@ jobs:
           script: |
             chmod +x /root/server
             nohup /root/server > /root/server.log 2>&1 &
+            echo "Server started on port 8080"
