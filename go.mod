@@ -1,4 +1,4 @@
-module github.com/Cognize-AI/client-cognize
+module github.com/Cognize-AI/server-cognize
 
 go 1.24.6
 

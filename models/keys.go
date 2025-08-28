@@ -9,7 +9,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/Cognize-AI/client-cognize/config"
+	"github.com/Cognize-AI/server-cognize/config"
 	"gorm.io/gorm"
 )
 

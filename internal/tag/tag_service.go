@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Cognize-AI/client-cognize/config"
-	"github.com/Cognize-AI/client-cognize/logger"
-	"github.com/Cognize-AI/client-cognize/models"
+	"github.com/Cognize-AI/server-cognize/config"
+	"github.com/Cognize-AI/server-cognize/logger"
+	"github.com/Cognize-AI/server-cognize/models"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 	"gorm.io/gorm"

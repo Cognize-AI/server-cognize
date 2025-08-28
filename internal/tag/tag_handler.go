@@ -3,8 +3,8 @@ package tag
 import (
 	"net/http"
 
-	"github.com/Cognize-AI/client-cognize/logger"
-	"github.com/Cognize-AI/client-cognize/util"
+	"github.com/Cognize-AI/server-cognize/logger"
+	"github.com/Cognize-AI/server-cognize/util"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )

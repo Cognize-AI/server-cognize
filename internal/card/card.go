@@ -3,8 +3,8 @@ package card
 import (
 	"context"
 
-	"github.com/Cognize-AI/client-cognize/internal/tag"
-	"github.com/Cognize-AI/client-cognize/models"
+	"github.com/Cognize-AI/server-cognize/internal/tag"
+	"github.com/Cognize-AI/server-cognize/models"
 )
 
 type GetCard struct {

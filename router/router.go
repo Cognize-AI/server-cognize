@@ -3,14 +3,14 @@ package router
 import (
 	"net/http"
 
-	"github.com/Cognize-AI/client-cognize/internal/card"
-	"github.com/Cognize-AI/client-cognize/internal/keys"
-	"github.com/Cognize-AI/client-cognize/internal/list"
-	"github.com/Cognize-AI/client-cognize/internal/oauth"
-	"github.com/Cognize-AI/client-cognize/internal/tag"
-	"github.com/Cognize-AI/client-cognize/internal/user"
-	"github.com/Cognize-AI/client-cognize/logger"
-	"github.com/Cognize-AI/client-cognize/middleware"
+	"github.com/Cognize-AI/server-cognize/internal/card"
+	"github.com/Cognize-AI/server-cognize/internal/keys"
+	"github.com/Cognize-AI/server-cognize/internal/list"
+	"github.com/Cognize-AI/server-cognize/internal/oauth"
+	"github.com/Cognize-AI/server-cognize/internal/tag"
+	"github.com/Cognize-AI/server-cognize/internal/user"
+	"github.com/Cognize-AI/server-cognize/logger"
+	"github.com/Cognize-AI/server-cognize/middleware"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )

@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/Cognize-AI/client-cognize/internal/card"
-	"github.com/Cognize-AI/client-cognize/models"
+	"github.com/Cognize-AI/server-cognize/internal/card"
+	"github.com/Cognize-AI/server-cognize/models"
 )
 
 type GetListResponse struct {

@@ -34,6 +34,23 @@ Authorization: <your-api-key>
 
 ## Endpoints
 
+### System
+
+#### Health Check
+
+Get system status and welcome message.
+
+```http
+GET /
+```
+
+**Response:**
+```
+Welcome to cognize
+```
+
+---
+
 ### Authentication
 
 #### Get Google OAuth Redirect URL

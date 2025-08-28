@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 
-	"github.com/Cognize-AI/client-cognize/models"
+	"github.com/Cognize-AI/server-cognize/models"
 )
 
 type GetMeRes struct {

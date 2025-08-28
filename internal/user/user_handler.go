@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Cognize-AI/client-cognize/logger"
-	"github.com/Cognize-AI/client-cognize/models"
+	"github.com/Cognize-AI/server-cognize/logger"
+	"github.com/Cognize-AI/server-cognize/models"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )

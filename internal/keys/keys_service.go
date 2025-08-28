@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/Cognize-AI/client-cognize/config"
-	"github.com/Cognize-AI/client-cognize/logger"
-	"github.com/Cognize-AI/client-cognize/models"
-	"github.com/Cognize-AI/client-cognize/util"
+	"github.com/Cognize-AI/server-cognize/config"
+	"github.com/Cognize-AI/server-cognize/logger"
+	"github.com/Cognize-AI/server-cognize/models"
+	"github.com/Cognize-AI/server-cognize/util"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )

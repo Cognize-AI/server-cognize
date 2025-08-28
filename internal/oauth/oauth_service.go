@@ -8,8 +8,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/Cognize-AI/client-cognize/config"
-	"github.com/Cognize-AI/client-cognize/models"
+	"github.com/Cognize-AI/server-cognize/config"
+	"github.com/Cognize-AI/server-cognize/models"
 	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/oauth2"
 	"gorm.io/gorm"

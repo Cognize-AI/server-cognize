@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Cognize-AI/client-cognize/config"
+	"github.com/Cognize-AI/server-cognize/config"
 	"github.com/gin-gonic/gin"
 )
 

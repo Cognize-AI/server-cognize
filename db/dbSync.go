@@ -1,8 +1,8 @@
 package db
 
 import (
-	"github.com/Cognize-AI/client-cognize/config"
-	"github.com/Cognize-AI/client-cognize/models"
+	"github.com/Cognize-AI/server-cognize/config"
+	"github.com/Cognize-AI/server-cognize/models"
 )
 
 func SyncDB() {

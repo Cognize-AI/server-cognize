@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/Cognize-AI/client-cognize/config"
+	"github.com/Cognize-AI/server-cognize/config"
 	adapter "github.com/axiomhq/axiom-go/adapters/zap"
 	"github.com/axiomhq/axiom-go/axiom"
 	"go.uber.org/zap"
