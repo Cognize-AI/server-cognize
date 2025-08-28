@@ -3,62 +3,50 @@ name: Deploy Go Server to EC2
 on:
   push:
     branches:
-      - main   # or master, whichever branch you deploy from
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout repo
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Setup Go
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.24.6   # ✅ adjust if you use a different version
+          go-version: 1.24.6
 
-      # 3. Debug repo structure (optional)
-      - name: Debug repo structure
-        run: ls -R
-
-      # 4. Build Go binary for Linux
       - name: Build Go binary
         run: |
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o server .
 
-      # 5. Stop old process & clean old binary
       - name: Stop old server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
+          username: ${{ secrets.EC2_USER }}   # still ubuntu or ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            sudo lsof -t -i:8080 | xargs -r sudo kill -9 || true
-            sudo rm -f /root/server || true
+            sudo su - root -c "lsof -t -i:8080 | xargs -r kill -9 || true"
+            sudo su - root -c "rm -f /root/server"
 
-      # 6. Upload new binary
       - name: Upload new binary
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
+          username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "server"
-          target: "/home/ubuntu/"
+          target: "/root/"
 
-      # 7. Move binary to /root/ and start server
-      - name: Start server
+      - name: Start server as root
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
+          username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            sudo mv /home/ubuntu/server /root/server
-            sudo chmod +x /root/server
-            nohup sudo /root/server > /root/server.log 2>&1 &
-            echo "Server started on port 8080"
+            sudo su - root -c "chmod +x /root/server"
+            sudo su - root -c "cd /root && nohup ./server > server.log 2>&1 &"
