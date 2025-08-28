@@ -90,11 +90,21 @@ type CompanyDetails struct {
 	DataType string `json:"data_type"`
 }
 
+type GetCardCompanyDetails struct {
+	Name     string `json:"name"`
+	Role     string `json:"role"`
+	Location string `json:"location"`
+	Phone    string `json:"phone"`
+	Email    string `json:"email"`
+}
+
 type GetCardByIDResp struct {
 	GetCard
-	ListName          string           `json:"list_name"`
-	AdditionalContact []ContactDetails `json:"additional_contact"`
-	AdditionalCompany []CompanyDetails `json:"additional_company"`
+	ListName          string                `json:"list_name"`
+	ListColor         string                `json:"list_color"`
+	Company           GetCardCompanyDetails `json:"company"`
+	AdditionalContact []ContactDetails      `json:"additional_contact"`
+	AdditionalCompany []CompanyDetails      `json:"additional_company"`
 }
 
 type BulkCreateResp struct {

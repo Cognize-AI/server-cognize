@@ -12,7 +12,6 @@ func SyncDB() {
 		models.Card{},
 		models.Tag{},
 		models.Key{},
-		models.Company{},
 		models.Activity{},
 		models.FieldDefinition{},
 		models.FieldValue{},

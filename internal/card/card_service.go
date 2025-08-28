@@ -263,6 +263,14 @@ func (s *service) GetCardByID(ctx context.Context, req GetCardByIDReq, user mode
 	var res = GetCardByIDResp{
 		resCard,
 		card.List.Name,
+		card.List.Color,
+		GetCardCompanyDetails{
+			Name:     card.CompanyName,
+			Role:     card.CompanyRole,
+			Location: card.CompanyLocation,
+			Phone:    card.CompanyPhone,
+			Email:    card.CompanyEmail,
+		},
 		additionalContactDetails,
 		additionalCompanyDetails,
 	}

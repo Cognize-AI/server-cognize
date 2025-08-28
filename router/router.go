@@ -3,6 +3,7 @@ package router
 import (
 	"net/http"
 
+	"github.com/Cognize-AI/client-cognize/internal/activity"
 	"github.com/Cognize-AI/client-cognize/internal/card"
 	"github.com/Cognize-AI/client-cognize/internal/field"
 	"github.com/Cognize-AI/client-cognize/internal/keys"
@@ -26,6 +27,7 @@ func InitRouter(
 	tagHandler *tag.Handler,
 	keyHandler *keys.Handler,
 	fieldHandler *field.Handler,
+	activityHandler *activity.Handler,
 ) {
 	r = gin.Default()
 
@@ -94,6 +96,11 @@ func InitRouter(
 	{
 		fieldRouter.POST("/field-definitions", middleware.RequireAuth, fieldHandler.CreateField)
 		fieldRouter.POST("/field-value", middleware.RequireAuth, fieldHandler.InsertFieldVal)
+	}
+
+	activityRouter := r.Group("/activity")
+	{
+		activityRouter.POST("/create", middleware.RequireAuth, activityHandler.CreateActivity)
 	}
 }
 
