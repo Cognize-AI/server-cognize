@@ -43,7 +43,7 @@ func InitRouter(
 
 	r.GET("/", func(c *gin.Context) {
 		logger.Logger.Info("lol")
-		c.String(http.StatusOK, "Welcome to cognize")
+		c.String(http.StatusOK, "Welcome to cognize!")
 	})
 
 	userRouter := r.Group("/user")
