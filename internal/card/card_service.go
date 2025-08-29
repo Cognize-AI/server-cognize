@@ -214,6 +214,10 @@ func (s *service) GetCardByID(ctx context.Context, req GetCardByIDReq, user mode
 	var fieldVals []models.FieldValue
 	var additionalContactDetails []ContactDetails
 	var additionalCompanyDetails []CompanyDetails
+	var cardActivity []models.Activity
+	var activity []GetCardActivity
+	var fieldDefIds []uint
+	var fieldDefs []models.FieldDefinition
 
 	s.DB.Preload("Tags").Preload("List").Where("id = ?", req.ID).First(&card)
 	if card.ID == 0 || card.List.UserID != user.ID {
@@ -221,20 +225,46 @@ func (s *service) GetCardByID(ctx context.Context, req GetCardByIDReq, user mode
 		return nil, errors.New("card_id not found for card_id: " + strconv.Itoa(int(req.ID)))
 	}
 
-	s.DB.Preload("FieldDefinition").Where("card_id = ?", card.ID).Find(&fieldVals)
+	s.DB.Where("card_id = ?", card.ID).First(&cardActivity)
+	for _, act := range cardActivity {
+		activity = append(activity, GetCardActivity{
+			ID:        act.ID,
+			Content:   act.Content,
+			CreatedAt: act.CreatedAt,
+		})
+	}
 
+	s.DB.Preload("FieldDefinition").Where("card_id = ?", card.ID).Find(&fieldVals)
 	for _, fieldVal := range fieldVals {
 		if models.FieldDefinitionType(fieldVal.FieldDefinition.Type) == models.CardTypeContact {
+			fieldDefIds = append(fieldDefIds, fieldVal.FieldDefinition.ID)
 			additionalContactDetails = append(additionalContactDetails, ContactDetails{
 				Name:     fieldVal.FieldDefinition.Name,
 				Value:    fieldVal.Value,
 				DataType: fieldVal.FieldDefinition.DataType,
 			})
 		} else if models.FieldDefinitionType(fieldVal.FieldDefinition.Type) == models.CardTypeCompany {
+			fieldDefIds = append(fieldDefIds, fieldVal.FieldDefinition.ID)
 			additionalCompanyDetails = append(additionalCompanyDetails, CompanyDetails{
 				Name:     fieldVal.FieldDefinition.Name,
 				Value:    fieldVal.Value,
 				DataType: fieldVal.FieldDefinition.DataType,
+			})
+		}
+	}
+	s.DB.Where("id not in (?) AND user_id = ?", fieldDefIds, user.ID).Find(&fieldDefs)
+	for _, fieldDef := range fieldDefs {
+		if models.FieldDefinitionType(fieldDef.Type) == models.CardTypeContact {
+			additionalContactDetails = append(additionalContactDetails, ContactDetails{
+				Name:     fieldDef.Name,
+				Value:    "",
+				DataType: fieldDef.DataType,
+			})
+		} else if models.FieldDefinitionType(fieldDef.Type) == models.CardTypeCompany {
+			additionalCompanyDetails = append(additionalCompanyDetails, CompanyDetails{
+				Name:     fieldDef.Name,
+				Value:    "",
+				DataType: fieldDef.DataType,
 			})
 		}
 	}
@@ -273,6 +303,7 @@ func (s *service) GetCardByID(ctx context.Context, req GetCardByIDReq, user mode
 		},
 		additionalContactDetails,
 		additionalCompanyDetails,
+		activity,
 	}
 
 	return &res, nil

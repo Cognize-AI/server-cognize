@@ -2,6 +2,7 @@ package card
 
 import (
 	"context"
+	"time"
 
 	"github.com/Cognize-AI/client-cognize/internal/tag"
 	"github.com/Cognize-AI/client-cognize/models"
@@ -98,6 +99,12 @@ type GetCardCompanyDetails struct {
 	Email    string `json:"email"`
 }
 
+type GetCardActivity struct {
+	ID        uint      `json:"id"`
+	Content   string    `json:"content"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 type GetCardByIDResp struct {
 	GetCard
 	ListName          string                `json:"list_name"`
@@ -105,6 +112,7 @@ type GetCardByIDResp struct {
 	Company           GetCardCompanyDetails `json:"company"`
 	AdditionalContact []ContactDetails      `json:"additional_contact"`
 	AdditionalCompany []CompanyDetails      `json:"additional_company"`
+	Activity          []GetCardActivity     `json:"activity"`
 }
 
 type BulkCreateResp struct {

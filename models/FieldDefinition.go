@@ -20,5 +20,6 @@ type FieldDefinition struct {
 	UserID   uint
 	Type     string `gorm:"type:varchar(20)"`
 
-	User User `gorm:"foreignKey:UserID;references:ID"`
+	User        User         `gorm:"foreignKey:UserID;references:ID"`
+	FieldValues []FieldValue `gorm:"foreignKey:FieldID;references:ID"`
 }

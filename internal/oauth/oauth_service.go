@@ -71,22 +71,22 @@ func (s *service) HandleGoogleCallback(c context.Context, req *HandleGoogleCallb
 		var lists []models.List
 
 		lists = append(lists, models.List{
-			Name:   "ux researcher",
+			Name:   "New Leads",
 			Color:  "#F9BA0B",
 			UserID: user.ID,
 		})
 		lists = append(lists, models.List{
-			Name:   "product designer",
+			Name:   "Follow Up",
 			Color:  "#40C2FC",
 			UserID: user.ID,
 		})
 		lists = append(lists, models.List{
-			Name:   "content strategist",
+			Name:   "Qualified",
 			Color:  "#75C699",
 			UserID: user.ID,
 		})
 		lists = append(lists, models.List{
-			Name:   "social media manager",
+			Name:   "Rejected",
 			Color:  "#EB695B",
 			UserID: user.ID,
 		})
@@ -95,23 +95,23 @@ func (s *service) HandleGoogleCallback(c context.Context, req *HandleGoogleCallb
 
 		var tags []models.Tag
 		tags = append(tags, models.Tag{
-			Name:   "New Leads",
+			Name:   "ux researcher",
 			Color:  "#A78BFA",
 			UserID: user.ID,
 		}, models.Tag{
-			Name:   "Follow Up",
+			Name:   "product designer",
 			Color:  "#FCA5A5",
 			UserID: user.ID,
 		}, models.Tag{
-			Name:   "Qualified",
+			Name:   "content strategist",
 			Color:  "#34D399",
 			UserID: user.ID,
 		}, models.Tag{
-			Name:   "In Negotiation",
+			Name:   "SEO specialist",
 			Color:  "#60A5FA",
 			UserID: user.ID,
 		}, models.Tag{
-			Name:   "High Priority",
+			Name:   "brand strategist",
 			Color:  "#FBBF24",
 			UserID: user.ID,
 		})
