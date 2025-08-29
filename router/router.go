@@ -70,6 +70,7 @@ func InitRouter(
 		cardRouter.DELETE("/:id", middleware.RequireAuth, cardHandler.DeleteCard)
 		cardRouter.PUT("/:id", middleware.RequireAuth, cardHandler.UpdateCard)
 		cardRouter.GET("/:id", middleware.RequireAuth, cardHandler.GetCardById)
+		cardRouter.PUT("/details/:id", middleware.RequireAuth, cardHandler.UpdateCardByID)
 	}
 
 	tagRouter := r.Group("/tag")

@@ -239,6 +239,7 @@ func (s *service) GetCardByID(ctx context.Context, req GetCardByIDReq, user mode
 		if models.FieldDefinitionType(fieldVal.FieldDefinition.Type) == models.CardTypeContact {
 			fieldDefIds = append(fieldDefIds, fieldVal.FieldDefinition.ID)
 			additionalContactDetails = append(additionalContactDetails, ContactDetails{
+				ID:       fieldVal.FieldDefinition.ID,
 				Name:     fieldVal.FieldDefinition.Name,
 				Value:    fieldVal.Value,
 				DataType: fieldVal.FieldDefinition.DataType,
@@ -246,6 +247,7 @@ func (s *service) GetCardByID(ctx context.Context, req GetCardByIDReq, user mode
 		} else if models.FieldDefinitionType(fieldVal.FieldDefinition.Type) == models.CardTypeCompany {
 			fieldDefIds = append(fieldDefIds, fieldVal.FieldDefinition.ID)
 			additionalCompanyDetails = append(additionalCompanyDetails, CompanyDetails{
+				ID:       fieldVal.FieldDefinition.ID,
 				Name:     fieldVal.FieldDefinition.Name,
 				Value:    fieldVal.Value,
 				DataType: fieldVal.FieldDefinition.DataType,
@@ -256,12 +258,14 @@ func (s *service) GetCardByID(ctx context.Context, req GetCardByIDReq, user mode
 	for _, fieldDef := range fieldDefs {
 		if models.FieldDefinitionType(fieldDef.Type) == models.CardTypeContact {
 			additionalContactDetails = append(additionalContactDetails, ContactDetails{
+				ID:       fieldDef.ID,
 				Name:     fieldDef.Name,
 				Value:    "",
 				DataType: fieldDef.DataType,
 			})
 		} else if models.FieldDefinitionType(fieldDef.Type) == models.CardTypeCompany {
 			additionalCompanyDetails = append(additionalCompanyDetails, CompanyDetails{
+				ID:       fieldDef.ID,
 				Name:     fieldDef.Name,
 				Value:    "",
 				DataType: fieldDef.DataType,
@@ -292,6 +296,7 @@ func (s *service) GetCardByID(ctx context.Context, req GetCardByIDReq, user mode
 
 	var res = GetCardByIDResp{
 		resCard,
+		card.Location,
 		card.List.Name,
 		card.List.Color,
 		GetCardCompanyDetails{
@@ -307,4 +312,30 @@ func (s *service) GetCardByID(ctx context.Context, req GetCardByIDReq, user mode
 	}
 
 	return &res, nil
+}
+
+func (s *service) UpdateCardByID(ctx context.Context, req UpdateCardByIDReq, user models.User) (*UpdateCardByIDResp, error) {
+	var card models.Card
+
+	s.DB.Preload("List").Where("id = ?", req.ID).First(&card)
+	if card.ID == 0 || card.ListID == 0 || card.List.UserID != user.ID {
+		logger.Logger.Error("card_id not found for card_id: ", zap.String("card_id", strconv.Itoa(int(req.ID))))
+		return nil, errors.New("card_id not found for card_id: " + strconv.Itoa(int(req.ID)))
+	}
+
+	card.Name = req.Name
+	card.Designation = req.Designation
+	card.Email = req.Email
+	card.Phone = req.Phone
+	card.ImageURL = req.ImageURL
+	card.Location = req.Location
+	card.CompanyName = req.CompanyName
+	card.CompanyRole = req.CompanyRole
+	card.CompanyLocation = req.CompanyLocation
+	card.CompanyPhone = req.CompanyPhone
+	card.CompanyEmail = req.CompanyEmail
+
+	s.DB.Save(&card)
+
+	return &UpdateCardByIDResp{card.ID}, nil
 }

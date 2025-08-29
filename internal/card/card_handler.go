@@ -165,3 +165,31 @@ func (h *Handler) GetCardById(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }
+
+func (h *Handler) UpdateCardByID(c *gin.Context) {
+	currentUser, valid := util.GetCurrentUser(c)
+	if !valid {
+		return
+	}
+
+	var req UpdateCardByIDReq
+	if err := c.ShouldBindUri(&req); err != nil {
+		logger.Logger.Warn("Failed to bind json :", zap.Error(err))
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.Logger.Warn("Failed to bind json :", zap.Error(err))
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	_, err := h.Service.UpdateCardByID(c, req, currentUser)
+	if err != nil {
+		logger.Logger.Error("Error updating card :", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": "ok"})
+}

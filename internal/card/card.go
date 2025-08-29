@@ -80,12 +80,14 @@ type GetCardByIDReq struct {
 }
 
 type ContactDetails struct {
+	ID       uint   `json:"id"`
 	Name     string `json:"name"`
 	Value    string `json:"value"`
 	DataType string `json:"data_type"`
 }
 
 type CompanyDetails struct {
+	ID       uint   `json:"id"`
 	Name     string `json:"name"`
 	Value    string `json:"value"`
 	DataType string `json:"data_type"`
@@ -107,6 +109,7 @@ type GetCardActivity struct {
 
 type GetCardByIDResp struct {
 	GetCard
+	Location          string                `json:"location"`
 	ListName          string                `json:"list_name"`
 	ListColor         string                `json:"list_color"`
 	Company           GetCardCompanyDetails `json:"company"`
@@ -118,6 +121,25 @@ type GetCardByIDResp struct {
 type BulkCreateResp struct {
 }
 
+type UpdateCardByIDReq struct {
+	ID              uint   `uri:"id" binding:"required"`
+	Name            string `json:"name"`
+	Designation     string `json:"designation"`
+	Email           string `json:"email"`
+	Phone           string `json:"phone"`
+	ImageURL        string `json:"image_url"`
+	Location        string `json:"location"`
+	CompanyName     string `json:"company_name"`
+	CompanyRole     string `json:"company_role"`
+	CompanyLocation string `json:"company_location"`
+	CompanyPhone    string `json:"company_phone"`
+	CompanyEmail    string `json:"company_email"`
+}
+
+type UpdateCardByIDResp struct {
+	ID uint `json:"id"`
+}
+
 type Service interface {
 	CreateCard(ctx context.Context, req CreateCardReq, user models.User) (*CreateCardResp, error)
 	MoveCard(ctx context.Context, req MoveCardReq, user models.User) error
@@ -125,4 +147,5 @@ type Service interface {
 	UpdateCard(ctx context.Context, req UpdateCardReq, user models.User) (*UpdateCardResp, error)
 	BulkCreate(ctx context.Context, req BulkCreateReq, key models.Key) (*BulkCreateResp, error)
 	GetCardByID(ctx context.Context, req GetCardByIDReq, user models.User) (*GetCardByIDResp, error)
+	UpdateCardByID(ctx context.Context, req UpdateCardByIDReq, user models.User) (*UpdateCardByIDResp, error)
 }
