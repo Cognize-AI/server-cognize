@@ -93,6 +93,34 @@ func (s *service) HandleGoogleCallback(c context.Context, req *HandleGoogleCallb
 
 		s.DB.Create(&lists)
 
+		var maxOrder float64
+		s.DB.Model(&models.Card{}).Select("COALESCE(MAX(card_order), 0)").Scan(&maxOrder)
+
+		var cards []models.Card
+		cards = append(cards, models.Card{
+			Name:        "Prashant Kumar Singh",
+			Designation: "Product Designer",
+			Email:       "prashantkumarsingh.work@gmail.com",
+			ImageURL:    "https://res.cloudinary.com/doigbqz0a/image/upload/v1756590064/my-project-folder/yalgse87vdd6jltfuwcl.png",
+			ListID:      lists[0].ID,
+			CardOrder:   maxOrder + 1,
+		}, models.Card{
+			Name:        "Anurag Daksh",
+			Designation: "Full Stack Developer",
+			Email:       "anuragdaksh.work@gmail.com",
+			ImageURL:    "https://lh3.googleusercontent.com/a/ACg8ocJw2xWE84QKYmFuzKTPglJM75nl3SFjohtEvDSkVy1thdiTDaeS6g=s96-c",
+			ListID:      lists[0].ID,
+			CardOrder:   maxOrder + 2,
+		}, models.Card{
+			Name:        "Rohit Chand",
+			Designation: "Frontend Developer",
+			Email:       "rohitchand010904@gmail.com",
+			ImageURL:    "https://lh3.googleusercontent.com/a/ACg8ocJqcXOqco1cLcCG3WJ3Z12GlNoXGRCRidYWuxTE_VVamqY2se4w=s96-c",
+			ListID:      lists[0].ID,
+			CardOrder:   maxOrder + 3,
+		})
+		s.DB.Create(&cards)
+
 		var tags []models.Tag
 		tags = append(tags, models.Tag{
 			Name:   "ux researcher",
