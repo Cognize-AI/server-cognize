@@ -28,7 +28,7 @@ func NewService() Service {
 	}
 }
 
-func RebalanceCards(db *gorm.DB, listID uint, userID uint) error {
+func RebalanceCards(db *gorm.DB, listID uint) error {
 	var cards []models.Card
 	if err := db.
 		Where("list_id = ?", listID).
@@ -100,7 +100,7 @@ func (s *service) MoveCard(ctx context.Context, req MoveCardReq, user models.Use
 		// Case 1: Move between two cards
 		if math.Abs(nextCard.CardOrder-prevCard.CardOrder) <= 1e-9 {
 			// Rebalance list if gap is too small
-			if err := RebalanceCards(s.DB, req.ListID, user.ID); err != nil {
+			if err := RebalanceCards(s.DB, req.ListID); err != nil {
 				return fmt.Errorf("failed to rebalance cards: %w", err)
 			}
 			// Reload neighbors after rebalance

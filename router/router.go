@@ -102,6 +102,8 @@ func InitRouter(
 	activityRouter := r.Group("/activity")
 	{
 		activityRouter.POST("/create", middleware.RequireAuth, activityHandler.CreateActivity)
+		activityRouter.DELETE("/:id", middleware.RequireAuth, activityHandler.DeleteActivity)
+		activityRouter.PUT("/:id", middleware.RequireAuth, activityHandler.UpdateActivity)
 	}
 }
 
