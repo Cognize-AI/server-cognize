@@ -225,7 +225,7 @@ func (s *service) GetCardByID(ctx context.Context, req GetCardByIDReq, user mode
 		return nil, errors.New("card_id not found for card_id: " + strconv.Itoa(int(req.ID)))
 	}
 
-	s.DB.Where("card_id = ?", card.ID).First(&cardActivity)
+	s.DB.Where("card_id = ?", card.ID).Find(&cardActivity)
 	for _, act := range cardActivity {
 		activity = append(activity, GetCardActivity{
 			ID:        act.ID,
@@ -254,7 +254,11 @@ func (s *service) GetCardByID(ctx context.Context, req GetCardByIDReq, user mode
 			})
 		}
 	}
-	s.DB.Where("id not in (?) AND user_id = ?", fieldDefIds, user.ID).Find(&fieldDefs)
+	if len(fieldDefIds) == 0 {
+		s.DB.Where("user_id = ?", user.ID).Find(&fieldDefs)
+	} else {
+		s.DB.Where("id not in (?) AND user_id = ?", fieldDefIds, user.ID).Find(&fieldDefs)
+	}
 	for _, fieldDef := range fieldDefs {
 		if models.FieldDefinitionType(fieldDef.Type) == models.CardTypeContact {
 			additionalContactDetails = append(additionalContactDetails, ContactDetails{

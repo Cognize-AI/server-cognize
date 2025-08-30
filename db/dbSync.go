@@ -6,6 +6,7 @@ import (
 )
 
 func SyncDB() {
+	config.DB.Exec("DROP INDEX IF EXISTS idx_activities_card_id;\n")
 	err := config.DB.AutoMigrate(
 		models.User{},
 		models.List{},
