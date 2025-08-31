@@ -17,6 +17,8 @@ type Card struct {
 	CompanyLocation string
 	CompanyPhone    string
 	CompanyEmail    string
+	ProfileUrl      string
+	AISummary       string `gorm:"type:text"`
 
 	List List  `gorm:"foreignKey:ListID;references:ID"`
 	Tags []Tag `gorm:"many2many:card_tags;"`

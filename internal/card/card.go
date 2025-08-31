@@ -68,6 +68,8 @@ type BulkProspect struct {
 	Email       string `json:"email"`
 	Phone       string `json:"phone"`
 	ImageURL    string `json:"image_url"`
+	ProfileURL  string `json:"profile_url"`
+	AISummary   string `json:"ai_summary"`
 }
 
 type BulkCreateReq struct {
@@ -109,6 +111,8 @@ type GetCardActivity struct {
 
 type GetCardByIDResp struct {
 	GetCard
+	ProfileURL        string                `json:"profile_url"`
+	AISummary         string                `json:"ai_summary"`
 	Location          string                `json:"location"`
 	ListName          string                `json:"list_name"`
 	ListColor         string                `json:"list_color"`

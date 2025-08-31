@@ -202,6 +202,8 @@ func (s *service) BulkCreate(ctx context.Context, req BulkCreateReq, key models.
 			ImageURL:    prospect.ImageURL,
 			ListID:      req.ListID,
 			CardOrder:   maxOrder + float64(i+1),
+			ProfileUrl:  prospect.ProfileURL,
+			AISummary:   prospect.AISummary,
 		})
 	}
 	s.DB.Create(&cards)
@@ -300,6 +302,8 @@ func (s *service) GetCardByID(ctx context.Context, req GetCardByIDReq, user mode
 
 	var res = GetCardByIDResp{
 		resCard,
+		card.ProfileUrl,
+		card.AISummary,
 		card.Location,
 		card.List.Name,
 		card.List.Color,
