@@ -33,7 +33,7 @@ func InitRouter(
 
 	r.Use(cors.New(cors.Config{
 		AllowOriginFunc: func(origin string) bool {
-			return origin == "http://localhost:3000" || origin == "https://client-cognize.vercel.app" || origin == "https://cognize.live"
+			return origin == "http://localhost:3000" || origin == "https://client-cognize.vercel.app" || origin == "https://cognize.live" || origin == "https://www.cognize.live"
 		},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
