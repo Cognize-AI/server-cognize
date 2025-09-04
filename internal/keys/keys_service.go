@@ -27,15 +27,12 @@ func NewService() Service {
 func (s *service) CreateAPIKey(ctx context.Context, user models.User) (*CreateAPIKeyRes, error) {
 	var key models.Key
 
-	// Check if API key exists
 	err := s.DB.Where("user_id = ? AND name = ?", user.ID, "API").First(&key).Error
 	if err == nil && key.ID != 0 {
-		// Found existing key
 		logger.Logger.Warn("api key already exists")
 		return &CreateAPIKeyRes{key.Value}, nil
 	}
 
-	// Generate new key
 	logger.Logger.Info("creating api key")
 	value, err := util.GenerateAPIKey()
 	if err != nil {
@@ -55,4 +52,21 @@ func (s *service) CreateAPIKey(ctx context.Context, user models.User) (*CreateAP
 	}
 
 	return &CreateAPIKeyRes{key.Value}, nil
+}
+
+func (s *service) GetAPIKey(ctx context.Context, user models.User) (*GetAPIKeyRes, error) {
+	var key models.Key
+
+	err := s.DB.Where("user_id = ? AND name = ?", user.ID, "API").First(&key).Error
+	if err != nil {
+		logger.Logger.Error("failed to get api key", zap.Error(err))
+		return nil, err
+	}
+
+	return &GetAPIKeyRes{
+		ID:        key.ID,
+		Key:       key.Value,
+		Name:      key.Name,
+		CreatedAt: key.CreatedAt,
+	}, nil
 }

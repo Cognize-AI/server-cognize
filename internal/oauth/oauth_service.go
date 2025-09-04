@@ -9,8 +9,11 @@ import (
 	"time"
 
 	"github.com/Cognize-AI/client-cognize/config"
+	"github.com/Cognize-AI/client-cognize/logger"
 	"github.com/Cognize-AI/client-cognize/models"
+	"github.com/Cognize-AI/client-cognize/util"
 	"github.com/golang-jwt/jwt/v4"
+	"go.uber.org/zap"
 	"golang.org/x/oauth2"
 	"gorm.io/gorm"
 )
@@ -32,6 +35,36 @@ func (s *service) GetRedirectURL(c context.Context) (*GetRedirectURLResp, error)
 	return &GetRedirectURLResp{
 		RedirectURL: url,
 	}, nil
+}
+
+func createAPIKey(s *service, user models.User) {
+	var key models.Key
+
+	err := s.DB.Where("user_id = ? AND name = ?", user.ID, "API").First(&key).Error
+	if err == nil && key.ID != 0 {
+		logger.Logger.Warn("api key already exists")
+		return
+	}
+
+	logger.Logger.Info("creating api key")
+	value, err := util.GenerateAPIKey()
+	if err != nil {
+		logger.Logger.Error("failed to generate api key", zap.Error(err))
+		return
+	}
+
+	key = models.Key{
+		Name:   "API",
+		Value:  value,
+		UserID: user.ID,
+	}
+
+	if err := s.DB.Create(&key).Error; err != nil {
+		logger.Logger.Error("failed to save api key", zap.Error(err))
+		return
+	}
+
+	return
 }
 
 func (s *service) HandleGoogleCallback(c context.Context, req *HandleGoogleCallbackReq) (*HandleGoogleCallbackResp, error) {
@@ -68,6 +101,9 @@ func (s *service) HandleGoogleCallback(c context.Context, req *HandleGoogleCallb
 			ProfilePicture: googleUser.Picture,
 		}
 		s.DB.Create(&user)
+
+		createAPIKey(s, user)
+
 		var lists []models.List
 
 		lists = append(lists, models.List{

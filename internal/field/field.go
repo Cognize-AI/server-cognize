@@ -25,7 +25,19 @@ type InsertFieldValRes struct {
 	ID uint `json:"id"`
 }
 
+type FieldWithSample struct {
+	ID          uint
+	Name        string
+	Type        string
+	SampleValue *string
+}
+
+type GetFieldsRes struct {
+	Fields []FieldWithSample `json:"fields"`
+}
+
 type Service interface {
 	CreateField(c context.Context, req CreateFieldReq, user models.User) (*CreateFieldRes, error)
 	InsertFieldVal(c context.Context, req InsertFieldValReq, user models.User) (*InsertFieldValRes, error)
+	GetFields(c context.Context, user models.User) (*GetFieldsRes, error)
 }

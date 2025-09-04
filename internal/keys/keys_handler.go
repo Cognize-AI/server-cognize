@@ -32,3 +32,19 @@ func (h *Handler) CreateAPI(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{"data": res})
 }
+
+func (h *Handler) GetAPI(c *gin.Context) {
+	currentUser, valid := util.GetCurrentUser(c)
+	if !valid {
+		return
+	}
+
+	res, err := h.Service.GetAPIKey(c, currentUser)
+	if err != nil {
+		logger.Logger.Error("failed to get api key", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": res})
+}

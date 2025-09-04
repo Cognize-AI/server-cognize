@@ -62,3 +62,19 @@ func (h *Handler) InsertFieldVal(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }
+
+func (h *Handler) GetFields(c *gin.Context) {
+	currentUser, valid := util.GetCurrentUser(c)
+	if !valid {
+		return
+	}
+
+	res, err := h.Service.GetFields(c, currentUser)
+	if err != nil {
+		logger.Logger.Error("GetFields", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": res})
+}

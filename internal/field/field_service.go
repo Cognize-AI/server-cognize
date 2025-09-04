@@ -95,3 +95,24 @@ func (s *service) InsertFieldVal(c context.Context, req InsertFieldValReq, user 
 
 	return &InsertFieldValRes{fieldVal.ID}, nil
 }
+
+func (s *service) GetFields(c context.Context, user models.User) (*GetFieldsRes, error) {
+	var result []FieldWithSample
+
+	query := `
+        SELECT fd.id, fd.name, fd.type,
+               (
+                   SELECT fv.value
+                   FROM field_values fv
+                   WHERE fv.field_id = fd.id
+                   LIMIT 1
+               ) AS sample_value
+        FROM field_definitions fd
+        WHERE fd.user_id = ?
+    `
+	if err := s.DB.Raw(query, user.ID).Scan(&result).Error; err != nil {
+		return nil, err
+	}
+
+	return &GetFieldsRes{result}, nil
+}

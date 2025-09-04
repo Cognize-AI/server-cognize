@@ -86,6 +86,7 @@ func InitRouter(
 	keyRouter := r.Group("/key")
 	{
 		keyRouter.GET("/api", middleware.RequireAuth, keyHandler.CreateAPI)
+		keyRouter.GET("/", middleware.RequireAuth, keyHandler.GetAPI)
 	}
 
 	APIRouter := r.Group("/api")
@@ -97,6 +98,7 @@ func InitRouter(
 	{
 		fieldRouter.POST("/field-definitions", middleware.RequireAuth, fieldHandler.CreateField)
 		fieldRouter.POST("/field-value", middleware.RequireAuth, fieldHandler.InsertFieldVal)
+		fieldRouter.GET("/", middleware.RequireAuth, fieldHandler.GetFields)
 	}
 
 	activityRouter := r.Group("/activity")
