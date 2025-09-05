@@ -78,3 +78,26 @@ func (h *Handler) GetFields(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }
+
+func (h *Handler) UpdateFieldDefinition(c *gin.Context) {
+	currentUser, valid := util.GetCurrentUser(c)
+	if !valid {
+		return
+	}
+
+	var req UpdateFieldDef
+	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.Logger.Error("UpdateFieldDefinition ShouldBindJSON", zap.Error(err))
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := h.Service.UpdateFieldDefinition(c, req, currentUser)
+	if err != nil {
+		logger.Logger.Error("UpdateFieldDefinition", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": "success"})
+}

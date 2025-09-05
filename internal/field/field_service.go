@@ -116,3 +116,23 @@ func (s *service) GetFields(c context.Context, user models.User) (*GetFieldsRes,
 
 	return &GetFieldsRes{result}, nil
 }
+
+func (s *service) UpdateFieldDefinition(c context.Context, req UpdateFieldDef, user models.User) error {
+	var fieldDef models.FieldDefinition
+
+	s.DB.Where("user_id = ? && id = ?", user.ID, req.ID).First(&fieldDef)
+	if fieldDef.ID == 0 {
+		logger.Logger.Error("Field definition does not exist")
+		return errors.New("field definition does not exist")
+	}
+
+	s.DB.Where("user_id = ? && name = ? && id != ?", user.ID, req.Name, req.ID).First(&fieldDef)
+	if fieldDef.ID != 0 {
+		logger.Logger.Error("Field definition with the same name already exists")
+		return errors.New("field definition with the same name already exists")
+	}
+	fieldDef.Name = req.Name
+	s.DB.Save(&fieldDef)
+
+	return nil
+}

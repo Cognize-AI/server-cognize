@@ -99,6 +99,7 @@ func InitRouter(
 		fieldRouter.POST("/field-definitions", middleware.RequireAuth, fieldHandler.CreateField)
 		fieldRouter.POST("/field-value", middleware.RequireAuth, fieldHandler.InsertFieldVal)
 		fieldRouter.GET("/", middleware.RequireAuth, fieldHandler.GetFields)
+		fieldRouter.PUT("/", middleware.RequireAuth, fieldHandler.UpdateFieldDefinition)
 	}
 
 	activityRouter := r.Group("/activity")
